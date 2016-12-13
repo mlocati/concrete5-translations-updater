@@ -12,7 +12,7 @@ class Controller extends Package
 {
     protected $pkgHandle = 'translations_updater';
 
-    protected $appVersionRequired = '5.7.5.9';
+    protected $appVersionRequired = '5.7.5';
 
     protected $pkgVersion = '1.0.0';
 
@@ -53,6 +53,6 @@ class Controller extends Package
     public function on_start()
     {
         $app = Application::getFacadeApplication();
-        (new ServiceProvider($app))->register();
+        id(new ServiceProvider($app))->register();
     }
 }

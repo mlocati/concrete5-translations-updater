@@ -7,6 +7,7 @@ use Concrete\Core\Localization\Localization;
 use Concrete\Core\Multilingual\Page\Section\Section;
 use Concrete\Core\Package\BrokenPackage;
 use Concrete\Core\Package\Package;
+use Concrete\Core\Support\Facade\Application;
 use Config;
 use Gettext\Translations;
 use MLocati\TranslationsUpdater\LanguageCollector\LanguageCollector;
@@ -20,8 +21,9 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
     public function view()
     {
         $availablePackages = array();
+        $app = isset($this->app) ? $this->app : Application::getFacadeApplication();
         if (class_exists('Concrete\Core\Package\PackageService', true)) {
-            $packageService = $this->app->make('Concrete\Core\Package\PackageService');
+            $packageService = $app->make('Concrete\Core\Package\PackageService');
             $packages = $packageService->getAvailablePackages(false);
         } else {
             $packages = Package::getAvailablePackages(false);
@@ -53,7 +55,7 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
 
             return $rc;
         });
-        $currentCoreVersion = $this->app->make('config')->get('concrete.version');
+        $currentCoreVersion = $app->make('config')->get('concrete.version');
         $allLocales = array();
         foreach ($allStats as $stat) {
             if ($stat->getHandle() === '') {
@@ -84,7 +86,7 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
         }
         $usedLocalesIDs = array();
         if (class_exists('Concrete\Core\Entity\Site\Locale', true)) {
-            $em = $this->app->make('Doctrine\ORM\EntityManagerInterface');
+            $em = $app->make('Doctrine\ORM\EntityManagerInterface');
             $siteLocales = $em->getRepository('Concrete\Core\Entity\Site\Locale')->findAll();
             foreach ($siteLocales as $siteLocale) {
                 $usedLocalesIDs[] = $siteLocale->getLocale();
@@ -133,9 +135,10 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
 
     protected function getPackagePath($packageHandle, $localeID, $absolute = false, $extension = 'mo')
     {
+        $app = isset($this->app) ? $this->app : Application::getFacadeApplication();
         $packageHandle = str_replace('-', '_', $packageHandle);
         $result = '/';
-        $result .= trim(str_replace(DIRECTORY_SEPARATOR, '/', $this->app->make('app_relative_path').'/'.DIRNAME_PACKAGES.'/'.$packageHandle.'/'.DIRNAME_LANGUAGES), '/');
+        $result .= trim(str_replace(DIRECTORY_SEPARATOR, '/', $app->make('app_relative_path').'/'.DIRNAME_PACKAGES.'/'.$packageHandle.'/'.DIRNAME_LANGUAGES), '/');
         $result .= '/'.$localeID.'/LC_MESSAGES/messages.'.$extension;
 
         if ($absolute) {
@@ -174,7 +177,8 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
                                 $url = 'https://github.com/concrete5/package-translations/raw/master/'.$stats->getHandle().'/'.$locale.'.po';
                                 $retrievedFormat = 'po';
                             }
-                            $client = $this->app->make('http/client');
+                            $app = isset($this->app) ? $this->app : Application::getFacadeApplication();
+                            $client = $app->make('http/client');
                             $client->setUri($url);
                             $data = $client->send()->getBody();
                             if ($retrievedFormat !== $format) {
@@ -241,7 +245,8 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
 
     public function updateTranslations()
     {
-        $e = $this->app->make('error');
+        $app = isset($this->app) ? $this->app : Application::getFacadeApplication();
+        $e = $app->make('error');
         if ($this->token->validate('update-translations-update-translations')) {
             $data = $this->getRequestedData('mo');
             if ($data === null) {
@@ -253,7 +258,7 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
                     $file = $this->getPackagePath($data['stats']->getHandle(), $data['locale'], true);
                 }
                 $directory = dirname($file);
-                $fs = $this->app->make('Illuminate\Filesystem\Filesystem');
+                $fs = $app->make('Illuminate\Filesystem\Filesystem');
                 if (!$fs->isDirectory($directory)) {
                     if (!$fs->makeDirectory($directory, DIRECTORY_PERMISSIONS_MODE_COMPUTED, true, true)) {
                         $e->add(t('Failed to create the local language directory'));

@@ -86,9 +86,13 @@ abstract class LanguageCollector
                 $rawData = $client->send()->getBody();
                 $result = array_merge($result, $collector->parseInfoData($rawData));
             }
-            $cacheItem->expiresAfter(static::CACHE_LIFETIME);
-            $cacheItem->set($result);
-            $cacheItem->save();
+            if (method_exists($cacheItem, 'expiresAfter')) {
+                $cacheItem->expiresAfter(static::CACHE_LIFETIME);
+                $cacheItem->set($result);
+                $cacheItem->save();
+            } else {
+                $cacheItem->set($result, static::CACHE_LIFETIME);
+            }
         }
 
         return $result;
