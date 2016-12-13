@@ -202,7 +202,7 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
         if ($this->token->validate('update-translations-download-translations')) {
             $data = $this->getRequestedData();
             if ($data !== null) {
-                $response = Response::create($result['data']);
+                $response = Response::create($data['data']);
                 $response->setPrivate();
                 switch ($data['format']) {
                     case 'po':
