@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<concrete5-cif version="1.0">
+	<singlepages>
+		<page name="Update Translations" path="/dashboard/system/multilingual/update_translations" filename="/dashboard/system/multilingual/update_translations.php" package="translations_updater" />
+	</singlepages>
+</concrete5-cif>
