@@ -1,6 +1,6 @@
 # concrete5 Translations Updater
 
-Based on the great [Core Translation Updater](https://github.com/hissy/addon_core_translation) package by @hissy, this concrete5 package allows you to update both the concrete5 translations, as well as the translations of the packages listed [here](http://concrete5.github.io/package-translations/).
+Based on the great [Core Translation Updater](https://github.com/hissy/addon_core_translation) package by @hissy, this concrete5 package allows you to update both the concrete5 translations, as well as the translations of the packages listed [here](https://concrete5.github.io/package-translations/).
 
 ## Installation
 
@@ -13,7 +13,9 @@ git clone https://github.com/mlocati/concrete5-translations-updater.git packages
 ```
 
 Once you have your local copy of Translation Updater, simply install it in the usual ways:
+
 1. via the concrete5 Dashboard page `Extend concrete5` > `Add Functionality`
+
 2. or via the [c5:package-install](http://documentation.concrete5.org/developers/appendix/cli-commands#c5-package-install) CLI command:  
   ```sh
   concrete/bin/concrete5 c5:package-install translations_updater  
