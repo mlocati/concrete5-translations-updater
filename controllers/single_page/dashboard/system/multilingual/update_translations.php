@@ -1,38 +1,42 @@
 <?php
+
 namespace Concrete\Package\TranslationsUpdater\Controller\SinglePage\Dashboard\System\Multilingual;
 
-use Punic\Language;
-use Config;
-use MLocati\TranslationsUpdater\LanguageCollector\LanguageCollector;
-use Concrete\Core\Package\PackageService;
+use Concrete\Core\Http\Response;
+use Concrete\Core\Localization\Localization;
+use Concrete\Core\Multilingual\Page\Section\Section;
 use Concrete\Core\Package\BrokenPackage;
+use Concrete\Core\Package\Package;
+use Config;
+use Gettext\Translations;
+use MLocati\TranslationsUpdater\LanguageCollector\LanguageCollector;
 use MLocati\TranslationsUpdater\ResourceStats;
 use Punic\Comparer;
-use Doctrine\ORM\EntityManagerInterface;
-use Concrete\Core\Entity\Site\Locale;
-use Concrete\Core\Localization\Localization;
-use Gettext\Translations;
-use Concrete\Core\Http\Response;
+use Punic\Language;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Illuminate\Filesystem\Filesystem;
 
 class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageController
 {
     public function view()
     {
-        $availablePackages = [];
-        $packageService = $this->app->make(PackageService::class);
-        foreach ($packageService->getAvailablePackages(false) as $package) {
-            if (!($pkg instanceof BrokenPackage)) {
+        $availablePackages = array();
+        if (class_exists('Concrete\Core\Package\PackageService', true)) {
+            $packageService = $this->app->make('Concrete\Core\Package\PackageService');
+            $packages = $packageService->getAvailablePackages(false);
+        } else {
+            $packages = Package::getAvailablePackages(false);
+        }
+        foreach ($packages as $package) {
+            if (!($package instanceof BrokenPackage)) {
                 $availablePackages[] = $package;
             }
         }
         /* @var \Concrete\Core\Package\Package[] $availablePackages */
         $currentCoreStats = null;
-        $otherCoresStats = [];
-        $allPackagesStats = [];
-        $installedPackagesStats = [];
-        $otherPackagesStats = [];
+        $otherCoresStats = array();
+        $allPackagesStats = array();
+        $installedPackagesStats = array();
+        $otherPackagesStats = array();
         $allStats = LanguageCollector::getResourceStats();
         usort($allStats, function (ResourceStats $a, ResourceStats $b) {
             if ($a->getHandle() === '') {
@@ -50,7 +54,7 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
             return $rc;
         });
         $currentCoreVersion = $this->app->make('config')->get('concrete.version');
-        $allLocales = [];
+        $allLocales = array();
         foreach ($allStats as $stat) {
             if ($stat->getHandle() === '') {
                 if ($currentCoreStats === null && version_compare($currentCoreVersion, $stat->getDisplayVersion()) >= 0) {
@@ -78,12 +82,21 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
                 }
             }
         }
-        $usedLocales = [];
-        $em = $this->app->make(EntityManagerInterface::class);
-        $siteLocales = $em->getRepository(Locale::class)->findAll();
-        foreach ($siteLocales as $siteLocale) {
-            /* @var Locale $siteLocale */
-            $usedLocales[$siteLocale->getLocale()] = Language::getName($siteLocale->getLocale());
+        $usedLocalesIDs = array();
+        if (class_exists('Concrete\Core\Entity\Site\Locale', true)) {
+            $em = $this->app->make('Doctrine\ORM\EntityManagerInterface');
+            $siteLocales = $em->getRepository('Concrete\Core\Entity\Site\Locale')->findAll();
+            foreach ($siteLocales as $siteLocale) {
+                $usedLocalesIDs[] = $siteLocale->getLocale();
+            }
+        } else {
+            foreach (Section::getList() as $section) {
+                $usedLocalesIDs[] = $section->getLocale();
+            }
+        }
+        $usedLocales = array();
+        foreach ($usedLocalesIDs as $usedLocaleID) {
+            $usedLocales[$usedLocaleID] = Language::getName($usedLocaleID);
         }
         if (!isset($usedLocales[Localization::activeLocale()])) {
             $usedLocales[Localization::activeLocale()] = Language::getName(Localization::activeLocale());
@@ -138,7 +151,7 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
         if ($format === null) {
             $format = $this->request->post('format');
         }
-        if (in_array($format, ['po', 'mo'])) {
+        if (in_array($format, array('po', 'mo'))) {
             $locale = $this->request->post('locale');
             if (is_string($locale) && $locale !== '') {
                 $statsKey = $this->request->post('stats');
@@ -182,12 +195,12 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
                                         break;
                                 }
                             }
-                            $result = [
+                            $result = array(
                                 'stats' => $stats,
                                 'format' => $format,
                                 'locale' => $locale,
                                 'data' => $data,
-                            ];
+                            );
                         }
                     }
                 }
@@ -240,7 +253,7 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
                     $file = $this->getPackagePath($data['stats']->getHandle(), $data['locale'], true);
                 }
                 $directory = dirname($file);
-                $fs = $this->app->make(Filesystem::class);
+                $fs = $this->app->make('Illuminate\Filesystem\Filesystem');
                 if (!$fs->isDirectory($directory)) {
                     if (!$fs->makeDirectory($directory, DIRECTORY_PERMISSIONS_MODE_COMPUTED, true, true)) {
                         $e->add(t('Failed to create the local language directory'));
@@ -271,8 +284,6 @@ class UpdateTranslations extends \Concrete\Core\Page\Controller\DashboardPageCon
             $e->add($this->token->getErrorMessage());
         }
 
-        $x = t('The local translations have been correctly updated.');
-
-        return $e->has() ? JsonResponse::create($e) : JsonResponse::create(['message' => $successMessage]);
+        return $e->has() ? JsonResponse::create($e) : JsonResponse::create(array('message' => $successMessage));
     }
 }

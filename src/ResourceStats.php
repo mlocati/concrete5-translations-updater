@@ -1,4 +1,5 @@
 <?php
+
 namespace MLocati\TranslationsUpdater;
 
 class ResourceStats
@@ -28,7 +29,7 @@ class ResourceStats
      *
      * @var array
      */
-    protected $localeProgress = [];
+    protected $localeProgress = array();
 
     /**
      * URL of the .po file.
@@ -239,11 +240,11 @@ class ResourceStats
      */
     public function toArray()
     {
-        $result = [
+        $result = array(
             'handle' => $this->handle,
             'version' => $this->getVersion(),
             'locales' => $this->localeProgress,
-        ];
+        );
 
         return $result;
     }

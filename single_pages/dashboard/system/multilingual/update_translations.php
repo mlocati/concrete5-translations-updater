@@ -30,6 +30,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
                     ?>
                     <option value="<?php echo h($currentCoreStats->getHandle().'@'.$currentCoreStats->getVersion()); ?>"><?php echo h($currentCoreStats->getDisplayName(true)); ?></option>
                     <?php
+
                 }
                 if (!empty($installedPackagesStats)) {
                     ?>
@@ -39,8 +40,8 @@ defined('C5_EXECUTE') or die('Access Denied.');
                             ?>
                             <option value="<?php echo h($stats->getHandle().'@'.$stats->getVersion()); ?>"><?php echo h($stats->getDisplayName(true)); ?></option>
                             <?php
-                        }
-                        ?>
+
+                        } ?>
                     </optgroup>
                     <?php
 
@@ -53,10 +54,11 @@ defined('C5_EXECUTE') or die('Access Denied.');
                             ?>
                             <option value="<?php echo h($stats->getHandle().'@'.$stats->getVersion()); ?>"><?php echo h($stats->getDisplayName(true)); ?></option>
                             <?php
-                        }
-                        ?>
+
+                        } ?>
                     </optgroup>
                     <?php
+
                 }
                 if (!empty($otherPackagesStats)) {
                     ?>
@@ -66,10 +68,11 @@ defined('C5_EXECUTE') or die('Access Denied.');
                             ?>
                             <option value="<?php echo h($stats->getHandle().'@'.$stats->getVersion()); ?>"><?php echo h($stats->getDisplayName(true)); ?></option>
                             <?php
-                        }
-                        ?>
+
+                        } ?>
                     </optgroup>
                     <?php
+
                 }
                 ?>
             </select>
@@ -84,6 +87,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
                         ?>
                         <option value="<?php echo h($localeID); ?>"><?php echo h($localeName); ?></option>
                         <?php
+
                     }
                     ?>
                 </optgroup>
@@ -94,6 +98,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
                             ?>
                             <option value="<?php echo h($localeID); ?>"><?php echo h($localeName); ?></option>
                             <?php
+
                         }
                     }
                     ?>
@@ -144,7 +149,7 @@ var RELPATHS = {
     packages: <?php echo json_encode($packageRelativePath); ?>,
 }
 var allStats = <?php
-$ja = [];
+$ja = array();
 foreach ($allStats as $stats) {
     $ja[$stats->getHandle().'@'.$stats->getVersion()] = $stats->toArray();
 }

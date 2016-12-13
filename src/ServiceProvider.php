@@ -1,9 +1,8 @@
 <?php
+
 namespace MLocati\TranslationsUpdater;
 
 use Concrete\Core\Foundation\Service\Provider;
-use Zend\Http\Client\Adapter\Curl;
-use Zend\Http\Client\Adapter\Socket;
 use Zend\Http\Client;
 
 /**
@@ -18,12 +17,12 @@ class ServiceProvider extends Provider
         if (!$this->app->bound('http/client')) {
             $this->app->bind('http/client', function ($app) {
                 $config = $app->make('config');
-                $options = [];
+                $options = array();
                 $options['sslverifypeer'] = $config->get('app.curl.verifyPeer') ? true : false;
                 if (function_exists('curl_init')) {
-                    $options['adapter'] = Curl::class;
+                    $options['adapter'] = 'Zend\Http\Client\Adapter\Curl';
                 } else {
-                    $options['adapter'] = Socket::class;
+                    $options['adapter'] = 'Zend\Http\Client\Adapter\Socket';
                 }
 
                 return new Client(null, $options);

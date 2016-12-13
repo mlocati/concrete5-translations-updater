@@ -1,8 +1,9 @@
 <?php
+
 namespace MLocati\TranslationsUpdater\LanguageCollector;
 
-use SimpleXMLElement;
 use MLocati\TranslationsUpdater\ResourceStats;
+use SimpleXMLElement;
 
 class CoreLanguageCollector extends LanguageCollector
 {
@@ -23,7 +24,7 @@ class CoreLanguageCollector extends LanguageCollector
      */
     protected function parseInfoData($data)
     {
-        $result = [];
+        $result = array();
         $xml = new SimpleXMLElement($data);
         $resources = $xml->xpath('/stats/resource');
         if (is_array($resources)) {

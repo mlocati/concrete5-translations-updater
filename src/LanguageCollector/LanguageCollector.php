@@ -1,4 +1,5 @@
 <?php
+
 namespace MLocati\TranslationsUpdater\LanguageCollector;
 
 use Concrete\Core\Support\Facade\Application;
@@ -40,7 +41,7 @@ abstract class LanguageCollector
      */
     protected static function getAllCollectors()
     {
-        $result = [];
+        $result = array();
         $hDir = @opendir(__DIR__);
         if ($hDir) {
             $me = basename(__FILE__);
@@ -78,14 +79,15 @@ abstract class LanguageCollector
             }
         }
         if ($result === null) {
-            $result = [];
+            $result = array();
             $client = $app->make('http/client');
             foreach (static::getAllCollectors() as $collector) {
                 $client->setUri($collector->getInfoURL());
                 $rawData = $client->send()->getBody();
                 $result = array_merge($result, $collector->parseInfoData($rawData));
             }
-            $cacheItem->set($result)->expiresAfter(static::CACHE_LIFETIME);
+            $cacheItem->expiresAfter(static::CACHE_LIFETIME);
+            $cacheItem->set($result);
             $cacheItem->save();
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace MLocati\TranslationsUpdater\LanguageCollector;
 
 use MLocati\TranslationsUpdater\ResourceStats;
@@ -22,7 +23,7 @@ class PackagesLanguageCollector extends LanguageCollector
      */
     protected function parseInfoData($data)
     {
-        $result = [];
+        $result = array();
         $obj = @json_decode($data, true);
         if (is_array($obj) && isset($obj['packages']) && is_array($obj['packages'])) {
             foreach ($obj['packages'] as $package) {

@@ -1,10 +1,10 @@
 <?php
+
 namespace Concrete\Package\TranslationsUpdater;
 
 use Concrete\Core\Package\Package;
-use Concrete\Core\Backup\ContentImporter;
-use MLocati\TranslationsUpdater\ServiceProvider;
 use Concrete\Core\Support\Facade\Application;
+use MLocati\TranslationsUpdater\ServiceProvider;
 
 defined('C5_EXECUTE') or die('Access Denied.');
 
@@ -12,13 +12,13 @@ class Controller extends Package
 {
     protected $pkgHandle = 'translations_updater';
 
-    protected $appVersionRequired = '8.0.0';
+    protected $appVersionRequired = '5.7.5.9';
 
     protected $pkgVersion = '1.0.0';
 
-    protected $pkgAutoloaderRegistries = [
+    protected $pkgAutoloaderRegistries = array(
         'src' => 'MLocati\\TranslationsUpdater',
-    ];
+    );
 
     public function getPackageName()
     {
@@ -45,8 +45,9 @@ class Controller extends Package
 
     private function installReal($fromVersion, $pkg)
     {
-        $contentImporter = $this->app->make(ContentImporter::class);
-        $contentImporter->importContentFile($this->getPackagePath() . '/config/install.xml');
+        $app = isset($this->app) ? $this->app : Application::getFacadeApplication();
+        $contentImporter = $app->make('Concrete\Core\Backup\ContentImporter');
+        $contentImporter->importContentFile($this->getPackagePath().'/config/install.xml');
     }
 
     public function on_start()
